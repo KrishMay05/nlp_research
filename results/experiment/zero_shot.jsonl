@@ -1,1 +1,1 @@
-{"id": "0", "prediction": "A"}
+{"id": "0", "prediction": "A", "probability_A": 0.9999980052700648, "request_metadata": {"model": "gemma4:26b-a4b", "served_model": "gemma4:26b-a4b", "seconds_including_throttle": 3.0754454639995856, "usage": {"completion_tokens": 1, "prompt_tokens": 235, "total_tokens": 236, "completion_tokens_details": {"accepted_prediction_tokens": null, "audio_tokens": null, "reasoning_tokens": 0, "rejected_prediction_tokens": null}, "prompt_tokens_details": null}}}

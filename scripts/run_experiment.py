@@ -22,6 +22,7 @@ except BlockingIOError:
     raise SystemExit('An experiment runner is already active')
 
 status = dict(state='running', model='gemma4:26b-a4b', target_snippets=151,
+              planned_unique_requests=14647, prompt_control='same-model reason-only template',
               started_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
               plan='docs/experiment-plan.md')
 

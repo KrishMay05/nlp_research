@@ -50,10 +50,14 @@ follow the root README. Live output may vary by hosted model version.
 `model-qualification.json` records that Gemma4 26B-A4B returned usable Yes/No
 probabilities and quote JSON, so it was selected on API functionality rather
 than test accuracy. `docs/experiment-plan.md` fixes all comparisons before the
-live evaluation. The newer implementation has 13 passing local tests.
+live evaluation. The newer implementation has 15 passing local tests.
 
 `experiment/` contains resumable live exports, which are **partial unless
 `status.json` says `complete` and all 151 IDs appear in the final evaluation**.
 Do not treat a prefix of annotations as a full experiment. The raw API cache is
 kept locally and excluded from Git. The human audit remains pending even after
 a successful automated scoring/evaluation run.
+
+The prompt-off factorial control is now rescored by the same current model,
+separate from the published cached XOR. This avoids a model/prompt confound;
+see the plan amendment. The controlled budget is 14,647 calls before retries.

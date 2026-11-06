@@ -50,9 +50,10 @@ solver result as a valid optimum.
 Run one snippet through every live scoring step first. On failure, preserve all
 successful content-addressed requests and diagnose before spending the full
 budget. Then resume over all 151 snippets with one sequential scorer, paced at
-3.2 seconds/request and bounded backoff. About 11,023 calls are required, not the
-proposal's estimated 3,600: 7,248 quote checks, 3,624 rebuttal scores, 151 zero-shot
-predictions. At 20 requests/minute the rate-limit floor is over nine hours.
+3.2 seconds/request and bounded backoff. The controlled design requires 14,647 calls: 7,248 quote checks, 3,624 corrected
+rebuttal scores, 3,624 original-prompt controls, and 151 zero-shot predictions.
+At the 3.2-second pacing interval this is at least roughly 13 hours, before slow
+model responses and retries.
 
 Require complete ID coverage before headline metrics. Report exact accuracy,
 retained-argument coverage, paired bootstrap intervals (10,000 resamples, seed
@@ -69,3 +70,16 @@ response, retry with up to two doubled output budgets (500 → 1,000 → 2,000).
 Never turn malformed or truncated output into a failed-quote judgment. A repeated
 failure blocks scoring rather than removing the corresponding argument/snippet.
 Successful requests are cached, so restarting the runner resumes prior work.
+
+## Method amendment: hold the scoring model constant
+
+Before computing any full-dataset live accuracy, review identified that using
+cached GPT-3.5 scores for the prompt-off factorial arm would confound the model
+change with the corrected prompt. Both factorial prompt settings now use
+Gemma4 26B-A4B. The off control uses the released grounding-rebuttal template,
+showing only the paired reason; the on prompt names both the rebuttal and its
+paired reason. The cached XOR remains a separate, unchanged reproduction.
+The cached validity potential remains fixed in both factorial settings.
+Existing quotes, corrected scores, and zero-shot responses remain reusable.
+This amendment is based on experimental control, not measured accuracy.
+The extra 3,624 control requests are included in the revised budget above.

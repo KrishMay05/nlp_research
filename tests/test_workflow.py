@@ -87,3 +87,13 @@ def test_truncated_quote_retries_without_dropping_argument(tmp_path, monkeypatch
     assert result['quote'] == 'NONE'
     assert calls[1]['max_tokens'] == 2 * calls[0]['max_tokens']
     assert len(list(tmp_path.glob('*.json'))) == 1
+
+
+def test_original_prompt_control_excludes_rebuttal_text():
+    from quote_power.scoring import original_rebuttal_prompt
+    row = dict(transcript='A: I decide.\nB: Okay.', arguments=[dict(id='a', text='A directs.')])
+    arg = dict(target='a', text='A was only suggesting.')
+    prompt = original_rebuttal_prompt(row, arg)
+    assert 'A directs.' in prompt
+    assert 'A was only suggesting.' not in prompt
+    assert 'When uncertain, output No.' in prompt

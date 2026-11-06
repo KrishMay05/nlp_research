@@ -107,3 +107,12 @@ def test_xor_empty_evidence_uses_declared_tie_rule():
     assert result['retained'] == 0
     assert result['fallback'] == 'no_surviving_reasons'
     assert result['objective'] is None
+
+
+def test_factorial_prompt_off_uses_same_model_control_not_cached_score():
+    row = fixture_row()
+    rules = 'XOR 2 1 2\nOROUT 2 3 1\nOROUT 2 6 2\nXOR 2 3 9'
+    ann = {'r': {'original_rebuttal_probability': .01, 'rebuttal_probability': 1.}}
+    assert xor(row, rules)['prediction'] == 'B'  # published cached baseline
+    assert xor(row, rules, ann, corrected=False)['prediction'] == 'A'
+    assert xor(row, rules, ann, corrected=True)['prediction'] == 'B'

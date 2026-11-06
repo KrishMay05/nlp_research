@@ -54,8 +54,9 @@ def grounded_labels(nodes, attacks):
 
 
 def grounding(arg, annotations, corrected):
-    if corrected and arg['kind'] == 'rebuttal':
-        probability = annotations.get(arg['id'], {}).get('rebuttal_probability')
+    field = 'rebuttal_probability' if corrected else 'original_rebuttal_probability'
+    if arg['kind'] == 'rebuttal' and (corrected or field in annotations.get(arg['id'], {})):
+        probability = annotations.get(arg['id'], {}).get(field)
         if probability is None or not 0 <= probability <= 1:
             raise ValueError(f"Missing/invalid corrected score for {arg['id']}")
         return math.log(max(probability, 1e-12))

@@ -41,6 +41,15 @@ def rebuttal_prompt(row, arg):
                            transcript=row['transcript'], rebuttal=arg['text'], paired_reason=target))
 
 
+def original_rebuttal_prompt(row, arg):
+    """Same-model negative control: the released template sees only the reason."""
+    target = next(a['text'] for a in row['arguments'] if a['id'] == arg['target'])
+    return ('In this task, you are given a conversation and a reason. You will need '
+            'to decide whether this reason can be grounded through the conversation. '
+            'Respond with Yes or No. When uncertain, output No.\n\nConversation:\n'
+            + row['transcript'] + '\n\nReason:\n' + target + '\n\noutput:')
+
+
 class Scorer:
     def __init__(self, model, cache, base_url=None):
         from openai import OpenAI
@@ -138,12 +147,19 @@ def score(rows, model, cache, output, base_url=None, limit=None):
         for arg in row['arguments']:
             ann = dict(id=arg['id'], **scorer.request(quote_prompt(row, arg), 'quote'))
             if arg['kind'] == 'rebuttal':
-                ann['rebuttal_probability'] = scorer.request(rebuttal_prompt(row, arg), 'yesno')['probability']
+                corrected = scorer.request(rebuttal_prompt(row, arg), 'yesno')
+                original = scorer.request(original_rebuttal_prompt(row, arg), 'yesno')
+                ann['rebuttal_probability'] = corrected['probability']
+                ann['original_rebuttal_probability'] = original['probability']
+                ann['corrected_score_metadata'] = corrected.get('_request_metadata')
+                ann['original_score_metadata'] = original.get('_request_metadata')
             annotations.append(ann)
             write(Path(output) / 'annotations.jsonl', annotations)
         prompt = json.dumps(dict(task='Does speaker A hold more conversational power than B? Answer only Yes or No.', transcript=row['transcript']))
-        probability = scorer.request(prompt, 'yesno')['probability']
-        zero.append(dict(id=row['id'], prediction='A' if probability >= .5 else 'B'))
+        answer = scorer.request(prompt, 'yesno')
+        probability = answer['probability']
+        zero.append(dict(id=row['id'], prediction='A' if probability >= .5 else 'B',
+                         probability_A=probability, request_metadata=answer.get('_request_metadata')))
         write(Path(output) / 'zero_shot.jsonl', zero)
     (Path(output) / 'scoring_metadata.json').write_text(json.dumps(dict(model=model, temperature=0, base_url=str(scorer.client.base_url),
-        snippets=len(zero), probability='P(Yes) / (P(Yes)+P(No)) from first token top logprobs', prompt_version=1), indent=2))
+        snippets=len(zero), probability='P(Yes) / (P(Yes)+P(No)) from first token top logprobs', prompt_version=2, prompt_control='same-model original reason-only template'), indent=2))

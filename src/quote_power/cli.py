@@ -34,11 +34,14 @@ def evaluate(args):
             for c in (False, True):
                 for agg in ('xor', 'grounded'):
                     # Validate all corrected scores, even where Dung ignores weights.
-                    if c:
-                        from .inference import grounding
-                        for row in rows:
-                            for arg in row['arguments']:
-                                grounding(arg, annotations, True)
+                    from .inference import grounding
+                    for row in rows:
+                        for arg in row['arguments']:
+                            if not c and arg['kind'] == 'rebuttal':
+                                p = annotations[arg['id']].get('original_rebuttal_probability')
+                                if p is None or not 0 <= p <= 1:
+                                    raise ValueError(f"Missing/invalid same-model original prompt score for {arg['id']}")
+                            grounding(arg, annotations, c)
                     methods[f'{agg}_quote{int(q)}_corrected{int(c)}'] = [
                         xor(r, rules, annotations, q, c) if agg == 'xor' else grounded(r, annotations, q, c) for r in rows]
     if args.zero_shot:

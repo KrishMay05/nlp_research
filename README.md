@@ -98,8 +98,9 @@ blank human fields, the returned quote, full transcript, and paired reason.
 ## Proposal details resolved explicitly
 
 The release has **3,624 reasons and 3,624 rebuttals**, for **7,248 argument texts**.
-Quote-checking all texts requires 7,248 calls, plus 3,624 corrected rebuttal calls
-and 151 zero-shot calls: up to **11,023 calls**, before retries. This exceeds the
+Quote-checking all texts requires 7,248 calls, plus 3,624 corrected rebuttal calls,
+3,624 same-model original-prompt controls, and 151 zero-shot calls:
+**14,647 calls**, before retries. This exceeds the
 proposal's approximate 3,600-call budget. No live calls run during setup.
 
 Under the proposal's unweighted grounded semantics, a corrected rebuttal score
@@ -151,7 +152,7 @@ availability and suitability for token scoring must be checked with your account
 The scorer paces network calls to at most one per 3.2 seconds and backs off on
 rate limits, transient failures, and JSON `null` responses. Run only one scoring
 process at a time; other API usage on your account shares the 20 requests/minute
-limit. At 11,023 calls, pacing alone requires roughly 9.8 hours, plus inference
+limit. At 14,647 calls, pacing alone requires roughly 13 hours, plus inference
 latency. Interrupted requests resume through the existing cache.
 
 The documentation does **not** establish token-logprob support; its example
@@ -176,3 +177,11 @@ or mistyped fields. The XOR arm explicitly falls back to A if no reasons survive
 recording `empty_evidence_fallbacks` in evaluation reports. Successful new API
 cache entries include server usage and elapsed time when exposed. Cached calls
 remain local, while final exports are intended for version control.
+
+The factorial now holds the current scoring model constant: prompt-off uses the
+released reason-only grounding template scored by the same Gemma4, and prompt-on
+uses the corrected rebuttal-and-reason question. The cached GPT-3.5 XOR remains
+a separate reproduction baseline. This avoids attributing a model change to a
+prompt correction. Including these 3,624 extra control calls revises the complete
+request budget to 14,647 (about 13 hours of pacing alone). Run `python scripts/run_experiment.py` with the activated environment to resume
+the full controlled experiment.

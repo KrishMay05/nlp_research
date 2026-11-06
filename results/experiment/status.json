@@ -1,7 +1,10 @@
 {
-  "state": "running",
+  "state": "same_model_control_smoke_complete",
   "model": "gemma4:26b-a4b",
   "target_snippets": 151,
   "started_at": "2026-11-06T17:16:38.912131+00:00",
-  "plan": "docs/experiment-plan.md"
+  "plan": "docs/experiment-plan.md",
+  "method_amendment": "Replace cached-model prompt-off arm with same-current-model reason-only prompt; retain cached XOR as separate baseline.",
+  "exported_arguments_at_checkpoint": 48,
+  "exported_zero_shot_at_checkpoint": 1
 }
