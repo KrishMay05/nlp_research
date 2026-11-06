@@ -31,6 +31,12 @@ def save_status():
     tmp.write_text(json.dumps(status, indent=2) + '\n')
     tmp.replace(OUT / 'status.json')
 
+previous_path = OUT / 'status.json'
+if previous_path.exists():
+    history_path = OUT / 'attempt_history.json'
+    history = json.loads(history_path.read_text()) if history_path.exists() else []
+    history.append(json.loads(previous_path.read_text()))
+    history_path.write_text(json.dumps(history, indent=2) + '\n')
 save_status()
 try:
     rows = load(ROOT / 'data/processed/snippets.jsonl')
@@ -47,6 +53,9 @@ try:
 except Exception as exc:
     status['state'] = 'blocked'
     status['error_type'] = type(exc).__name__
+    body = getattr(exc, 'body', None)
+    if isinstance(body, dict) and body.get('detail') == 'Open WebUI: Server Connection Error':
+        status['service_error'] = 'Purdue Open WebUI backend connection failure'
     # Only locally generated validation errors are recorded verbatim. SDK HTTP
     # error bodies/headers are deliberately excluded from published artifacts.
     if isinstance(exc, ValueError):

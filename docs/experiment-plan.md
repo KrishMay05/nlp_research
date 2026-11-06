@@ -89,3 +89,9 @@ span matches within the cited speaker's turn, the model's support/attribution
 judgments, and the final retention rate. Counts are reported for all arguments
 and separately for reasons/rebuttals. Model judgments are not human correctness
 labels. This reporting addition does not change prompts or predictions.
+
+Purdue Open WebUI has been observed to return HTTP 400 with the exact detail
+`Open WebUI: Server Connection Error` for a backend outage. The authenticated
+model-list endpoint still returned 200. Only this exact HTTP 400 response is
+retried with the existing four-attempt backoff; invalid request parameters are
+not retried. Failed attempts are preserved in the runner's attempt history.

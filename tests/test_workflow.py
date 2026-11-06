@@ -101,3 +101,31 @@ def test_original_prompt_control_excludes_rebuttal_text():
     assert 'A directs.' in prompt
     assert 'A was only suggesting.' not in prompt
     assert 'When uncertain, output No.' in prompt
+
+
+def test_openwebui_connection_error_is_retried_but_invalid_requests_are_not(tmp_path, monkeypatch):
+    import httpx
+    import openai
+    import quote_power.scoring as scoring
+    calls, sleeps = [], []
+    request = httpx.Request('POST', 'https://test.invalid/chat/completions')
+    response = httpx.Response(400, request=request)
+    body = {'detail': 'Open WebUI: Server Connection Error'}
+    def create(**kwargs):
+        calls.append(kwargs)
+        if len(calls) == 1:
+            raise openai.BadRequestError('backend unavailable', response=response, body=body)
+        return Obj(choices=[])
+    monkeypatch.setenv('LLM_API_KEY', 'test-placeholder')
+    monkeypatch.setattr(openai, 'OpenAI', lambda **kw: Obj(base_url='https://test.invalid/v1', chat=Obj(completions=Obj(create=create))))
+    monkeypatch.setattr(scoring.time, 'sleep', sleeps.append)
+    scorer = Scorer('test', tmp_path)
+    with pytest.raises(ValueError, match='no completion choices'):
+        scorer.request('test', 'yesno')
+    assert len(calls) == 2 and 5 in sleeps
+    calls.clear()
+    body['detail'] = 'Invalid request parameter'
+    with pytest.raises(openai.BadRequestError):
+        scorer.request('invalid', 'yesno')
+    assert len(calls) == 1
+    assert not list(tmp_path.glob('*.json'))

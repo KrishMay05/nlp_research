@@ -63,7 +63,7 @@ class Scorer:
         self.cache.mkdir(parents=True, exist_ok=True)
 
     def _completion(self, payload):
-        from openai import APIConnectionError, APITimeoutError, InternalServerError, RateLimitError
+        from openai import APIConnectionError, APITimeoutError, BadRequestError, InternalServerError, RateLimitError
         for attempt in range(4):
             # Keep below Purdue's 20 requests/minute, including retries. Cached
             # responses do not consume rate-limit budget. Run one scoring process.
@@ -72,6 +72,12 @@ class Scorer:
             self._last_request = time.monotonic()
             try:
                 response = self.client.chat.completions.create(**payload)
+            except BadRequestError as exc:
+                # Open WebUI reports a transient backend outage as HTTP 400.
+                # Retry only this exact documented-by-observation service error.
+                body = exc.body if isinstance(exc.body, dict) else {}
+                if body.get('detail') != 'Open WebUI: Server Connection Error' or attempt == 3:
+                    raise
             except (APIConnectionError, APITimeoutError, InternalServerError, RateLimitError):
                 if attempt == 3:
                     raise
