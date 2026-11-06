@@ -1,0 +1,31 @@
+{
+  "model": "gemma4:26b-a4b",
+  "selection_basis": "Usable Yes/No probabilities; 4B activated parameters advertised by model ID; no billing prices supplied; no label-based model selection.",
+  "checks": [
+    {
+      "kind": "yesno",
+      "result": {
+        "probability": 0.9999999987101631,
+        "observed_yes_no_mass": 1.000000005649521,
+        "response": "Yes"
+      }
+    },
+    {
+      "kind": "quote",
+      "result": {
+        "quote": "NONE",
+        "evidence_speaker": "A",
+        "supports": false,
+        "attribution_correct": true
+      }
+    },
+    {
+      "kind": "yesno",
+      "result": {
+        "probability": 3.3214189520922946e-05,
+        "observed_yes_no_mass": 0.9999999995395515,
+        "response": "No"
+      }
+    }
+  ]
+}

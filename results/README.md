@@ -44,3 +44,16 @@ and remain local under ignored `data/`. Audit transcripts and the smoke quote
 are excerpts from that public release, not newly generated conversations.
 Credentials and API response caches are excluded. To rerun offline evaluation,
 follow the root README. Live output may vary by hosted model version.
+
+## Subsequent full-experiment attempt
+
+`model-qualification.json` records that Gemma4 26B-A4B returned usable Yes/No
+probabilities and quote JSON, so it was selected on API functionality rather
+than test accuracy. `docs/experiment-plan.md` fixes all comparisons before the
+live evaluation. The newer implementation has 13 passing local tests.
+
+`experiment/` contains resumable live exports, which are **partial unless
+`status.json` says `complete` and all 151 IDs appear in the final evaluation**.
+Do not treat a prefix of annotations as a full experiment. The raw API cache is
+kept locally and excluded from Git. The human audit remains pending even after
+a successful automated scoring/evaluation run.

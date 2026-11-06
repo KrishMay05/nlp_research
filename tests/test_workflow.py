@@ -26,6 +26,8 @@ def test_api_cache_reuses_only_matching_requests(tmp_path, monkeypatch):
     assert len(calls) == 2
     with pytest.raises((json.JSONDecodeError, ValueError)):
         scorer.request('bad JSON response', 'quote')
+    assert calls[-1]['response_format']['json_schema']['strict'] is True
+    assert calls[-1]['response_format']['json_schema']['schema']['additionalProperties'] is False
     assert len(list(tmp_path.glob('*.json'))) == 2
 
 
@@ -66,3 +68,22 @@ def test_purdue_null_backoff_and_endpoint(tmp_path, monkeypatch):
         scorer.request('test', 'yesno')
     assert 5 in pauses  # documented null response triggers bounded backoff
     assert not list(tmp_path.glob('*.json'))
+
+
+def test_truncated_quote_retries_without_dropping_argument(tmp_path, monkeypatch):
+    import openai
+    import quote_power.scoring as scoring
+    calls = []
+    valid = dict(quote='NONE', evidence_speaker='A', supports=False, attribution_correct=True)
+    def create(**kwargs):
+        calls.append(kwargs)
+        if len(calls) == 1:
+            return Obj(choices=[Obj(message=Obj(content='{"quote":'), finish_reason='length')])
+        return Obj(choices=[Obj(message=Obj(content=json.dumps(valid)), finish_reason='stop')])
+    monkeypatch.setenv('LLM_API_KEY', 'test-placeholder')
+    monkeypatch.setattr(openai, 'OpenAI', lambda **kw: Obj(base_url='https://test.invalid/v1', chat=Obj(completions=Obj(create=create))))
+    monkeypatch.setattr(scoring.time, 'sleep', lambda _: None)
+    result = Scorer('test', tmp_path).request('quote prompt', 'quote')
+    assert result['quote'] == 'NONE'
+    assert calls[1]['max_tokens'] == 2 * calls[0]['max_tokens']
+    assert len(list(tmp_path.glob('*.json'))) == 1

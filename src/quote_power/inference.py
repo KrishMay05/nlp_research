@@ -81,6 +81,9 @@ def grounded(row, annotations=None, quote_filter=False, corrected=False):
 def xor(row, rules, annotations=None, quote_filter=False, corrected=False, relaxation=False):
     annotations = annotations or {}
     args = kept(row, annotations, quote_filter)
+    if not any(a['kind'] == 'reason' for a in args):
+        return dict(prediction='A', retained=len(args), power_A=1., power_B=0.,
+                    objective=None, fallback='no_surviving_reasons')
     active = {a['variable'] for a in args}
     model = pulp.LpProblem('power', pulp.LpMaximize)
     x = [pulp.LpVariable(f'x{i}', 0, 1, cat='Continuous' if relaxation else 'Binary') for i in range(98)]

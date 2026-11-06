@@ -11,3 +11,11 @@ results/*
 !results/purdue-smoke.json
 !results/audit.jsonl
 .env
+
+!results/model-qualification.json
+!results/experiment/
+results/experiment/run.lock
+results/experiment/*.tmp
+
+# Keep the user-uploaded source proposal local.
+docs/NLP_proposal.pdf

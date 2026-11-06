@@ -50,6 +50,7 @@ def evaluate(args):
     report = dict(snippets=len(rows), published_xor_accuracy=.543, methods={})
     for name, values in methods.items():
         report['methods'][name] = dict(accuracy=accuracy(gold, predictions[name]),
+            empty_evidence_fallbacks=sum(v.get('fallback') == 'no_surviving_reasons' for v in values),
             argument_coverage=(sum(r.get('retained', 0) for r in values) / sum(len(r['arguments']) for r in rows)) if name not in {'zero_shot', 'majority_A'} else None,
             comparisons={b: paired(gold, predictions[name], predictions[b]) for b in ('majority_A', 'xor_cached', 'zero_shot') if b in predictions and b != name})
     report['xor_published_delta'] = report['methods']['xor_cached']['accuracy'] - .543

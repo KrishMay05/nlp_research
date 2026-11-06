@@ -1,0 +1,8 @@
+{
+  "model": "gemma4:26b-a4b",
+  "temperature": 0,
+  "base_url": "https://genai.rcac.purdue.edu/api/",
+  "snippets": 1,
+  "probability": "P(Yes) / (P(Yes)+P(No)) from first token top logprobs",
+  "prompt_version": 1
+}

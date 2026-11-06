@@ -34,7 +34,9 @@ def load(path):
 def write(path, records):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in records))
+    temporary = path.with_suffix(path.suffix + '.tmp')
+    temporary.write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in records))
+    temporary.replace(path)
 
 
 def prepare(upstream, output):

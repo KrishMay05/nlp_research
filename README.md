@@ -161,3 +161,18 @@ corrected-score experiment is blocked; do not substitute invented probabilities.
 For structured output, use a vLLM-backed model supporting `response_format` with
 this scorer. Ollama's documented `format` parameter needs a separate adapter.
 No Purdue model/API call has yet been validated with a real token.
+
+## Live experiment execution plan
+
+The fixed [experiment plan](docs/experiment-plan.md) records the proposal-based
+comparisons and model-selection rules. Model qualification found that
+`gemma4:26b-a4b` provides valid quote JSON and usable Yes/No log probabilities on
+representative prompts. This supersedes the earlier smoke tests of Gemma3,
+Qwen3 and GPT-OSS; those reports remain as historical evidence. No claim is made
+that the full live experiment has finished or improved accuracy.
+
+Quote responses now use Purdue's documented strict JSON schema to avoid missing
+or mistyped fields. The XOR arm explicitly falls back to A if no reasons survive,
+recording `empty_evidence_fallbacks` in evaluation reports. Successful new API
+cache entries include server usage and elapsed time when exposed. Cached calls
+remain local, while final exports are intended for version control.

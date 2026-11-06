@@ -1,0 +1,7 @@
+{
+  "state": "running",
+  "model": "gemma4:26b-a4b",
+  "target_snippets": 151,
+  "started_at": "2026-11-06T17:16:38.912131+00:00",
+  "plan": "docs/experiment-plan.md"
+}

@@ -96,3 +96,14 @@ def test_released_data_and_reproduction():
     assert sum(len(r['arguments']) for r in rows) == 7248
     results = [xor(r, rules)['prediction'] for r in rows]
     assert sum(r['label'] == p for r, p in zip(rows, results)) == 82
+
+
+def test_xor_empty_evidence_uses_declared_tie_rule():
+    row = fixture_row()
+    anns = {a['id']: dict(quote='NONE', evidence_speaker='A', supports=False, attribution_correct=False) for a in row['arguments']}
+    rules = 'XOR 2 1 2\nOROUT 2 3 1\nOROUT 2 6 2\nXOR 2 3 9'
+    result = xor(row, rules, anns, quote_filter=True)
+    assert result['prediction'] == 'A'
+    assert result['retained'] == 0
+    assert result['fallback'] == 'no_surviving_reasons'
+    assert result['objective'] is None
