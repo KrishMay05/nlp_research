@@ -83,3 +83,9 @@ The cached validity potential remains fixed in both factorial settings.
 Existing quotes, corrected scores, and zero-shot responses remain reusable.
 This amendment is based on experimental control, not measured accuracy.
 The extra 3,624 control requests are included in the revised budget above.
+
+Quote reporting distinguishes normalized span matches anywhere in the snippet,
+span matches within the cited speaker's turn, the model's support/attribution
+judgments, and the final retention rate. Counts are reported for all arguments
+and separately for reasons/rebuttals. Model judgments are not human correctness
+labels. This reporting addition does not change prompts or predictions.

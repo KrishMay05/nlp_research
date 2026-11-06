@@ -45,6 +45,10 @@ def test_factorial_full_pipeline(tmp_path):
     evaluate(args)
     report = json.loads((tmp_path / 'out/report.json').read_text())
     assert len(report['methods']) == 12  # 8 factorial + 3 cached + zero-shot
+    assert report['quote_checks']['all']['total'] == 2
+    assert report['quote_checks']['all']['normalized_span_matches'] == 2
+    assert report['quote_checks']['all']['retained'] == 2
+    assert report['quote_checks']['rebuttal']['retention_fraction'] is None
     assert report['snippets'] == 1
     assert all(v['accuracy'] == 1 for v in report['methods'].values())
 

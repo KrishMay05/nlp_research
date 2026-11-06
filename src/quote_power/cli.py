@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .data import load, prepare, write
 from .evaluation import accuracy, paired
-from .inference import grounded, xor
+from .inference import grounded, kept, quote_matches, xor
 
 
 def keyed(path):
@@ -14,6 +14,29 @@ def keyed(path):
     if len(result) != len(records):
         raise ValueError(f'Duplicate IDs in {path}')
     return result
+
+
+def quote_diagnostics(rows, annotations):
+    """Separate exact-span matches from the model's semantic judgments."""
+    retained = {a['id'] for row in rows for a in kept(row, annotations, True)}
+    report = {}
+    for group in ('all', 'reason', 'rebuttal'):
+        pairs = [(row, a) for row in rows for a in row['arguments']
+                 if group == 'all' or a['kind'] == group]
+        stats = dict(total=len(pairs), normalized_span_matches=0,
+                     speaker_bound_span_matches=0, support_judgment_true=0,
+                     attribution_judgment_true=0, retained=0)
+        for row, arg in pairs:
+            ann = annotations[arg['id']]
+            stats['normalized_span_matches'] += quote_matches(row['transcript'], ann.get('quote'))
+            stats['speaker_bound_span_matches'] += ann.get('evidence_speaker') in ('A', 'B') and quote_matches(row['transcript'], ann.get('quote'), ann['evidence_speaker'])
+            stats['support_judgment_true'] += ann.get('supports') is True
+            stats['attribution_judgment_true'] += ann.get('attribution_correct') is True
+            stats['retained'] += arg['id'] in retained
+        stats['span_match_fraction'] = stats['normalized_span_matches'] / len(pairs) if pairs else None
+        stats['retention_fraction'] = stats['retained'] / len(pairs) if pairs else None
+        report[group] = stats
+    return report
 
 
 def evaluate(args):
@@ -56,6 +79,8 @@ def evaluate(args):
             empty_evidence_fallbacks=sum(v.get('fallback') == 'no_surviving_reasons' for v in values),
             argument_coverage=(sum(r.get('retained', 0) for r in values) / sum(len(r['arguments']) for r in rows)) if name not in {'zero_shot', 'majority_A'} else None,
             comparisons={b: paired(gold, predictions[name], predictions[b]) for b in ('majority_A', 'xor_cached', 'zero_shot') if b in predictions and b != name})
+    if args.factorial:
+        report['quote_checks'] = quote_diagnostics(rows, annotations)
     report['xor_published_delta'] = report['methods']['xor_cached']['accuracy'] - .543
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
