@@ -120,3 +120,11 @@ def test_factorial_prompt_off_uses_same_model_control_not_cached_score():
     assert xor(row, rules)['prediction'] == 'B'  # published cached baseline
     assert xor(row, rules, ann, corrected=False)['prediction'] == 'A'
     assert xor(row, rules, ann, corrected=True)['prediction'] == 'B'
+
+
+def test_literal_speaker_label_is_part_of_its_own_turn():
+    transcript = 'A: Set the agenda.\nB: I agree.'
+    assert quote_matches(transcript, 'A: Set the agenda.', 'A')
+    assert not quote_matches(transcript, 'A: Set the agenda.', 'B')
+    assert quote_matches('A:Decide.\nB:Okay.', 'A:Decide.', 'A')
+    assert not quote_matches(transcript, 'A: Set the agenda. B: I agree.', 'A')

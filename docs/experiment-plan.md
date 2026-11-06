@@ -110,3 +110,11 @@ controlled ablation, not a byte-for-byte rerun of every wrapper bug. Only the
 separate cached XOR baseline is a reproduction of the released cached scores.
 Interpret prompt contrasts as reason-only versus corrected questions, without
 claiming they isolate all historical implementation bugs.
+
+The within-speaker verbatim check includes the literal speaker marker when it
+is present in the quoted span (for example, `A: Set the agenda.`). Stripping
+that marker from the source turn produced false negatives for literal quotes;
+the matcher now preserves it. Cross-speaker spans still fail this conservative
+single-turn criterion. This correctness fix was identified from quote strings
+and model support judgments, without inspecting classification accuracy; it
+does not change API prompts or require new calls.

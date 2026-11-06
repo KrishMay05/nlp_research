@@ -16,7 +16,7 @@ def quote_matches(transcript, quote, speaker=None):
         return normalize(quote) in normalize(transcript)
     # Match within a complete speaker turn; never across two speakers' turns.
     turns = re.split(r'(?m)^\s*([AB]):', transcript)
-    return any(turns[i] == speaker and normalize(quote) in normalize(turns[i + 1])
+    return any(turns[i] == speaker and normalize(quote) in normalize(turns[i] + ':' + turns[i + 1])
                for i in range(1, len(turns) - 1, 2))
 
 
