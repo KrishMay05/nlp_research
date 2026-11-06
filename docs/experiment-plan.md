@@ -94,7 +94,8 @@ Purdue Open WebUI has been observed to return HTTP 400 with the exact detail
 `Open WebUI: Server Connection Error` for a backend outage. The authenticated
 model-list endpoint still returned 200. Only this exact HTTP 400 response is
 retried with the existing four-attempt backoff; invalid request parameters are
-not retried. Failed attempts are preserved in the runner's attempt history.
+not retried. Terminal run failures are preserved in the runner's attempt history; individual
+HTTP retry attempts are not a complete billing ledger.
 
 For grounded aggregation, also report the fraction of all source reasons
 labelled IN and the counts of decisions made by IN-reason counts, grounding

@@ -1,19 +1,14 @@
 {
-  "state": "blocked",
+  "state": "running",
   "model": "gemma4:26b-a4b",
   "target_snippets": 151,
   "planned_unique_requests": 14647,
   "prompt_control": "same-model reason-only template",
-  "started_at": "2026-11-06T17:49:08.590366+00:00",
+  "started_at": "2026-11-06T18:56:36.296299+00:00",
   "plan": "docs/experiment-plan.md",
-  "error_type": "BadRequestError",
-  "updated_at": "2026-11-06T18:20:15.292711+00:00",
-  "exported_arguments": 586,
-  "exported_zero_shot": 12,
-  "service_error": "Purdue Open WebUI backend connection failure",
-  "diagnosis": {
-    "authenticated_models_http": 200,
-    "failing_prompt_characters": 1055,
-    "scope": "backend connection; not an expired-token finding"
-  }
+  "source_commit": "f75654c61f4d90acc3eb2dfa387b2875007e8fab",
+  "checkpoint_at": "2026-11-06T19:11:39.504716+00:00",
+  "exported_arguments_at_checkpoint": 981,
+  "exported_zero_shot_at_checkpoint": 20,
+  "complete_evaluation": false
 }
