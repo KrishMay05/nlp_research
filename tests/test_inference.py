@@ -37,10 +37,14 @@ def test_rebuttal_attack_and_fixed_tie_rules():
     result = grounded(row)
     assert result['labels'] == {'a': 'OUT', 'r': 'IN', 'b': 'IN'}
     assert result['prediction'] == 'B'
+    assert result['accepted_reason_count'] == 1
+    assert result['decision_route'] == 'in_reason_count'
     row['arguments'] = row['arguments'][:2]
     assert grounded(row)['prediction'] == 'A'  # unresolved cycle, grounding tie break
+    assert grounded(row)['decision_route'] == 'grounding_score_tie_break'
     row['arguments'][1]['grounding'] = math.log(.9)
     assert grounded(row)['prediction'] == 'A'  # final tie
+    assert grounded(row)['decision_route'] == 'final_A_tie_break'
 
 
 def test_filter_keeps_snippet_and_requires_semantic_checks():

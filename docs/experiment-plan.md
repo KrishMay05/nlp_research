@@ -95,3 +95,17 @@ Purdue Open WebUI has been observed to return HTTP 400 with the exact detail
 model-list endpoint still returned 200. Only this exact HTTP 400 response is
 retried with the existing four-attempt backoff; invalid request parameters are
 not retried. Failed attempts are preserved in the runner's attempt history.
+
+For grounded aggregation, also report the fraction of all source reasons
+labelled IN and the counts of decisions made by IN-reason counts, grounding
+tie-breaks, and the final A tie-break. These explain graph behavior without
+changing the predeclared decision rules.
+
+The released wrapper is asymmetric: one branch passes the paired reason into
+the grounding template, while the other passes the rebuttal under the label
+"Reason". The uniform reason-only prompt-off arm follows the proposal's
+hypothesized missing-rebuttal condition on both sides; it is an explicit
+controlled ablation, not a byte-for-byte rerun of every wrapper bug. Only the
+separate cached XOR baseline is a reproduction of the released cached scores.
+Interpret prompt contrasts as reason-only versus corrected questions, without
+claiming they isolate all historical implementation bugs.

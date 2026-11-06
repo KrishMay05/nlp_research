@@ -76,7 +76,11 @@ def grounded(row, annotations=None, quote_filter=False, corrected=False):
     # Corrected rebuttal scores do not threshold attacks: every retained rebuttal
     # attacks, per the proposal. The corrected grounded arms are thus identical.
     prediction = max(('A', 'B'), key=lambda s: (counts[s], sums[s], s == 'A'))
-    return dict(prediction=prediction, retained=len(args), labels=labels)
+    route = ('in_reason_count' if counts['A'] != counts['B'] else
+             'grounding_score_tie_break' if sums['A'] != sums['B'] else 'final_A_tie_break')
+    return dict(prediction=prediction, retained=len(args), labels=labels,
+                accepted_reason_count=sum(counts.values()), kept_reason_count=len(reasons),
+                decision_route=route)
 
 
 def xor(row, rules, annotations=None, quote_filter=False, corrected=False, relaxation=False):
