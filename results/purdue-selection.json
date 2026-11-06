@@ -1,0 +1,4 @@
+{
+  "selector_model": "gemma3:1b",
+  "response": "{\"model\": \"gemma3:12b\",\"rationale\":\"This is a general-purpose language model known for its strong performance across various tasks, including verbatim quote extraction and yes/no classification. It\u2019s relatively lightweight compared to larger models, making it suitable for resource optimization while maintaining reasonable accuracy.\"}"
+}

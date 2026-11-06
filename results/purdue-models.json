@@ -1,0 +1,134 @@
+[
+  {
+    "id": "deepseek-r1:1.5b",
+    "description": "> ### Deepseek-r1 : 1.5b  \n>  \n> \ud83d\udd34 **Reasoning**\u2003\ud83d\udfe0 **Lightweight**\u2003\ud83d\udd35 **Fast**  \n>  \n> *Deepseek-r1  | 1.5B Parameters | 128K tokens*  \n>  \n> ---  \n> **\u2605 Best for**  \n> - quick prototyping  \n> - low-latency chatbot interfaces  \n> - small-scale reasoning tasks  \n>  \n> **\ud83d\udca1 Use cases**  \n> - educational tools  \n> - edge deployments  \n> - math-focused tutoring agents  \n"
+  },
+  {
+    "id": "deepseek-r1:14b",
+    "description": null
+  },
+  {
+    "id": "deepseek-r1:32b",
+    "description": null
+  },
+  {
+    "id": "deepseek-r1:7b",
+    "description": null
+  },
+  {
+    "id": "gemma3:12b",
+    "description": null
+  },
+  {
+    "id": "gemma3:1b",
+    "description": null
+  },
+  {
+    "id": "gemma3:27b",
+    "description": null
+  },
+  {
+    "id": "llama3.1:70b-instruct-q4_K_M",
+    "description": null
+  },
+  {
+    "id": "llama3.1:latest",
+    "description": null
+  },
+  {
+    "id": "llama3.2:latest",
+    "description": null
+  },
+  {
+    "id": "llama3.3:70b",
+    "description": null
+  },
+  {
+    "id": "llama4:latest",
+    "description": "Meta\u2019s efficient multimodal MoE model for reasoning, coding, image understanding, and long-context tasks."
+  },
+  {
+    "id": "llava:latest",
+    "description": null
+  },
+  {
+    "id": "mistral:latest",
+    "description": null
+  },
+  {
+    "id": "phi4:latest",
+    "description": null
+  },
+  {
+    "id": "qwen2.5:72b",
+    "description": null
+  },
+  {
+    "id": "qwen3:1.7b",
+    "description": null
+  },
+  {
+    "id": "qwen3:14b",
+    "description": null
+  },
+  {
+    "id": "qwen3:30b",
+    "description": null
+  },
+  {
+    "id": "qwen3:32b",
+    "description": null
+  },
+  {
+    "id": "qwen3:4b",
+    "description": null
+  },
+  {
+    "id": "qwen3:8b",
+    "description": null
+  },
+  {
+    "id": "qwq:32b-fp16",
+    "description": null
+  },
+  {
+    "id": "qwq:latest",
+    "description": null
+  },
+  {
+    "id": "codellama:latest",
+    "description": null
+  },
+  {
+    "id": "gpt-oss:120b",
+    "description": "OpenAI\u2019s open-weight models designed for powerful reasoning, agentic tasks, and versatile developer use cases."
+  },
+  {
+    "id": "gpt-oss:latest",
+    "description": null
+  },
+  {
+    "id": "devstral-small-2:latest",
+    "description": null
+  },
+  {
+    "id": "gemma4:26b-a4b",
+    "description": "Google's state-of-the-art open-weight multimodal model built for reasoning, coding, and agentic workflows. Uses a Mixture-of-Experts (MoE) architecture with 26B total parameters and only ~4B active per token, delivering excellent quality while remaining highly efficient. Supports text and image inputs, function calling, structured outputs, and advanced reasoning capabilities."
+  },
+  {
+    "id": "medgemma:27b",
+    "description": null
+  },
+  {
+    "id": "qwen3-coder:latest",
+    "description": null
+  },
+  {
+    "id": "qwen3-vl:32b",
+    "description": null
+  },
+  {
+    "id": "qwen3.8:27b",
+    "description": "Alibaba's latest general-purpose reasoning model optimized for coding, tool use and agentic workflows. Delivers strong performance across instruction following, software development, and structured output generation while remaining efficient to deploy."
+  }
+]

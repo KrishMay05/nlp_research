@@ -1,0 +1,34 @@
+{
+  "model": "gemma3:12b",
+  "connection": "authenticated models and chat HTTP 200",
+  "yesno_passed": false,
+  "yesno_error": "Model must expose first-token log probabilities",
+  "quote": {
+    "quote": "you know, i- i- i- i-\n      some compromise between always depending on the first fifteen frames and\n      a- a- always depending on a - a pause is - is - is a good idea.",
+    "evidence_speaker": "A",
+    "supports": true,
+    "attribution_correct": true
+  },
+  "quote_schema_passed": true,
+  "quote_verbatim_match": true,
+  "fallback_probability_checks": {
+    "qwen3:4b": {
+      "passed": false,
+      "error": "Model must expose first-token log probabilities"
+    },
+    "gpt-oss:120b": {
+      "passed": false,
+      "error": "Both Yes and No must appear in top log probabilities"
+    }
+  },
+  "project_tests": {
+    "passed": 11,
+    "failed": 0
+  },
+  "offline_accuracy": {
+    "majority_A": 0.5496688741721855,
+    "xor_cached": 0.543046357615894,
+    "grounded_cached": 0.45695364238410596
+  },
+  "gpt_oss_diagnosis": "First generated token is <|channel|>, not a Yes/No answer. It exposes logprobs but needs a model-specific answer-token adapter; current one-token scorer is incompatible."
+}

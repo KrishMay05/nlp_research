@@ -1,0 +1,65 @@
+{
+  "snippets": 151,
+  "published_xor_accuracy": 0.543,
+  "methods": {
+    "majority_A": {
+      "accuracy": 0.5496688741721855,
+      "argument_coverage": null,
+      "comparisons": {
+        "xor_cached": {
+          "accuracy_delta": 0.006622516556291391,
+          "ci95": [
+            -0.10596026490066225,
+            0.11920529801324503
+          ],
+          "mcnemar_exact_p": 1.0,
+          "wins": 37,
+          "losses": 36
+        }
+      }
+    },
+    "xor_cached": {
+      "accuracy": 0.543046357615894,
+      "argument_coverage": 1.0,
+      "comparisons": {
+        "majority_A": {
+          "accuracy_delta": -0.006622516556291391,
+          "ci95": [
+            -0.11920529801324503,
+            0.10596026490066225
+          ],
+          "mcnemar_exact_p": 1.0,
+          "wins": 36,
+          "losses": 37
+        }
+      }
+    },
+    "grounded_cached": {
+      "accuracy": 0.45695364238410596,
+      "argument_coverage": 1.0,
+      "comparisons": {
+        "majority_A": {
+          "accuracy_delta": -0.09271523178807947,
+          "ci95": [
+            -0.2251655629139073,
+            0.039735099337748346
+          ],
+          "mcnemar_exact_p": 0.20649820735970978,
+          "wins": 46,
+          "losses": 60
+        },
+        "xor_cached": {
+          "accuracy_delta": -0.08609271523178808,
+          "ci95": [
+            -0.16556291390728478,
+            -0.006622516556291391
+          ],
+          "mcnemar_exact_p": 0.05325191409792751,
+          "wins": 13,
+          "losses": 26
+        }
+      }
+    }
+  },
+  "xor_published_delta": 4.635761589399934e-05
+}
