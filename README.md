@@ -1,9 +1,13 @@
 # Quote-Grounded Arguments for Conversational Power
 
 Research implementation of the supplied Patel, Kim, and Alladin proposal.
-The offline experiment is runnable now. Live quote checks, corrected rebuttal
-scores, and zero-shot predictions require an explicitly selected model and API
-credentials; no model-generated results are bundled or fabricated.
+Code, tests, and recorded results are committed on the `main` branch.
+
+- [Completed baseline results](results/experiment/baseline_evaluation/README.md): all 151 snippets; Gemma4 zero-shot 66/151 (43.71%), cached XOR 82/151 (54.30%), majority A 83/151 (54.97%).
+- [Live experiment status](results/experiment/status.json) and [argument annotations](results/experiment/annotations.jsonl): checkpointed outputs from the ongoing full experiment; these are partial until status says `complete`.
+- [Results index](results/README.md), [experiment methods](docs/experiment-plan.md), [source code](src/quote_power), and [tests](tests).
+
+Purdue API access and `gemma4:26b-a4b` quote JSON and Yes/No probabilities have been verified. The full argument experiment is still running; no full factorial accuracy result is claimed.
 
 ## Quick start
 
@@ -74,7 +78,7 @@ Supply `LLM_API_KEY` securely in environment settings; `OPENAI_API_KEY`, if alre
 available, is also recognized. Do not commit credentials. The default endpoint is
 `https://api.openai.com/v1`; a compatible endpoint may be selected with `--base-url`.
 The selected model must support temperature 0, JSON output, and top token logprobs.
-Model compatibility and live API access have not been validated in this environment.
+Purdue API access and Gemma4 compatibility are verified; see [model qualification](results/model-qualification.json).
 
 ```bash
 # Select a real model ID supported by your account. Start with one snippet.
@@ -161,7 +165,7 @@ quote run. If the chosen backend does not expose probabilities, the proposed
 corrected-score experiment is blocked; do not substitute invented probabilities.
 For structured output, use a vLLM-backed model supporting `response_format` with
 this scorer. Ollama's documented `format` parameter needs a separate adapter.
-No Purdue model/API call has yet been validated with a real token.
+Authenticated Purdue calls have succeeded with the configured token; Gemma4 supports the required probabilities.
 
 ## Live experiment execution plan
 

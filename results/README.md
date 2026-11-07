@@ -1,7 +1,11 @@
 # Recorded results
 
-These artifacts were generated on November 6, 2026. They distinguish completed
-checks from the live experiment that remains blocked.
+These artifacts were generated on November 6–7, 2026. The full argument experiment is running; completed baselines and partial live outputs are linked below.
+
+- [Completed 151-snippet baseline report](experiment/baseline_evaluation/README.md), [metrics](experiment/baseline_evaluation/report.json), and [per-snippet predictions](experiment/baseline_evaluation/predictions.jsonl).
+- [Live status](experiment/status.json), [partial argument annotations](experiment/annotations.jsonl), and [completed zero-shot predictions](experiment/zero_shot.jsonl).
+
+Gemma4 zero-shot scored **66/151 (43.71%)**, compared with cached XOR **82/151 (54.30%)** and majority A **83/151 (54.97%)**. Full factorial results remain pending.
 
 - `offline/report.json`: all 151 snippets; exact accuracy, argument coverage,
   paired bootstrap intervals, and exact McNemar comparisons.
@@ -27,7 +31,7 @@ checks from the live experiment that remains blocked.
 Gemma3 12B produced a valid quote with the expected schema and speaker attribution
 on one argument. Gemma3 12B and Qwen3 4B returned no token probabilities. GPT-OSS
 120B exposed probabilities for a control token, requiring an answer-token adapter.
-The full quote-filtered factorial and zero-shot evaluation have NOT been run.
+Those were earlier qualification attempts. Gemma4 subsequently passed qualification and completed all 151 zero-shot predictions. The full quote-filtered factorial remains in progress.
 No measured improvement from live rescoring is claimed.
 
 ## Provenance and reproduction
