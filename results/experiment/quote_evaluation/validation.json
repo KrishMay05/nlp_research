@@ -1,0 +1,30 @@
+{
+  "validated_at": "2026-11-07T20:58:56.237752+00:00",
+  "scope": "quote_filter_only",
+  "snippets": 151,
+  "arguments": 7248,
+  "reasons": 3624,
+  "rebuttals": 3624,
+  "zero_shot": 151,
+  "methods": 6,
+  "correct": {
+    "grounded_cached": 69,
+    "grounded_quote1_cached_scores": 64,
+    "majority_A": 83,
+    "xor_cached": 82,
+    "xor_quote1_cached_scores": 64,
+    "zero_shot": 66
+  },
+  "served_quote_models": {
+    "not recorded": 21,
+    "gemma4:26b-a4b": 7227
+  },
+  "model_metadata_note": "21 early responses predate metadata recording; all 7248 exactly match cache keys for the Purdue endpoint and requested Gemma4 model.",
+  "partial_factorial_annotations_preserved": 3332,
+  "partial_quote_responses_identical": true,
+  "filtered_xor_grounded_prediction_disagreements": 12,
+  "human_audit_items": 40,
+  "human_judgments": "pending",
+  "successful_cached_requests": 10737,
+  "checks": "unique/exact IDs, finite probabilities, threshold consistency, independent accuracy recount, offline exact model/endpoint/payload cache verification, unchanged cached quote responses, preserved partial factorial, blank human fields"
+}

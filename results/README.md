@@ -1,74 +1,39 @@
 # Recorded results
 
-These artifacts were generated on November 6–7, 2026. The full argument experiment is running; completed baselines and partial live outputs are linked below.
+The [quote-filter experiment report](experiment/quote_evaluation/README.md)
+contains the completed results on all 151 snippets and 7,248 argument texts.
+Both filtered methods scored 64/151 (42.38%), compared with cached XOR 82/151
+(54.30%) and majority A 83/151 (54.97%). Quote filtering did not help in this run.
 
-- [Completed 151-snippet baseline report](experiment/baseline_evaluation/README.md), [metrics](experiment/baseline_evaluation/report.json), and [per-snippet predictions](experiment/baseline_evaluation/predictions.jsonl).
-- [Live status](experiment/status.json), [partial argument annotations](experiment/annotations.jsonl), and [completed zero-shot predictions](experiment/zero_shot.jsonl).
+| Artifact | Contents |
+| --- | --- |
+| [Final metrics](experiment/quote_evaluation/report.json) | Six methods, quote diagnostics, coverage, paired bootstrap intervals, exact McNemar tests |
+| [Final predictions](experiment/quote_evaluation/predictions.jsonl) | Every method on every snippet |
+| [Final validation](experiment/quote_evaluation/validation.json) | Exact coverage, independent recount, cache provenance, pending human audit |
+| [Quote annotations](experiment/quote_annotations.jsonl) | All 7,248 model quote judgments |
+| [Zero-shot predictions](experiment/zero_shot.jsonl) | All 151 predictions and probabilities |
+| [Run status](experiment/status.json) | Completed reduced scope; original factorial remains partial |
+| [Human audit](experiment/audit.jsonl) | Seeded 40-item worksheet with blank human judgments |
+| [Model qualification](model-qualification.json) | Gemma4 JSON and token-logprob qualification |
+| [Cache reuse check](experiment/cache_reuse_check.json) | Offline inventory at the user-directed scope amendment |
+| [Partial factorial annotations](experiment/annotations.jsonl) | Preserved 3,332-item export; not complete-dataset factorial results |
+| [Attempt history](experiment/attempt_history.json) | Earlier run failures, interruptions, and scope change |
+| [Earlier baseline evaluation](experiment/baseline_evaluation/README.md) | Completed cached and zero-shot baseline report |
+| [Offline metrics](offline/report.json) | Original cached-score baselines |
 
-Gemma4 zero-shot scored **66/151 (43.71%)**, compared with cached XOR **82/151 (54.30%)** and majority A **83/151 (54.97%)**. Full factorial results remain pending.
+`purdue-models.json`, `purdue-selection.json`, and `purdue-smoke.json` are earlier
+qualification artifacts, including unsuccessful Gemma3/Qwen3/GPT-OSS probability
+checks. They are superseded by successful Gemma4 qualification. The original
+`audit.jsonl` is an earlier unfilled worksheet. Historical reports retain their
+original test counts; the current suite has 22 passing tests.
 
-- `offline/report.json`: all 151 snippets; exact accuracy, argument coverage,
-  paired bootstrap intervals, and exact McNemar comparisons.
-- `offline/predictions.jsonl`: a prediction for every snippet and cached method.
-- `purdue-models.json`: available model IDs and descriptions; account identifiers removed.
-- `purdue-selection.json`: the hosted LLM's resource-efficient model recommendation.
-  Pricing was unavailable; this does not prove the model is cheapest.
-- `purdue-smoke.json`: successful authenticated API connection and quote extraction,
-  unsuccessful probability checks, diagnostics, and 11 passing local tests.
-- `audit.jsonl`: reproducibly sampled 40-item audit worksheet. Human fields are
-  blank; this is NOT a completed human evaluation or gold annotation set.
+The original corrected-prompt factorial was deferred at the user's request to
+reduce calls. New rebuttal probabilities are ignored in the completed fixed-score
+comparison. All successful cache entries remain local for potential resumption;
+cache identity includes endpoint/model/payload. No Nous credit was spent.
 
-## Completed offline baseline
-
-| Method | Correct | Total | Accuracy |
-| --- | ---: | ---: | ---: |
-| Majority A | 83 | 151 | 54.97% |
-| Cached XOR | 82 | 151 | 54.30% |
-| Unfiltered grounded | 69 | 151 | 45.70% |
-
-## Incomplete live experiment
-
-Gemma3 12B produced a valid quote with the expected schema and speaker attribution
-on one argument. Gemma3 12B and Qwen3 4B returned no token probabilities. GPT-OSS
-120B exposed probabilities for a control token, requiring an answer-token adapter.
-Those were earlier qualification attempts. Gemma4 subsequently passed qualification and completed all 151 zero-shot predictions. The full quote-filtered factorial remains in progress.
-No measured improvement from live rescoring is claimed.
-
-## Provenance and reproduction
-
-Upstream: https://github.com/kandicew/social-reasoning
-
-Commit: `fed11b69765b4a398ce4a985adedfb65ec3098ab`.
-
-Source cache SHA-256:
+Source: https://github.com/kandicew/social-reasoning at
+`fed11b69765b4a398ce4a985adedfb65ec3098ab`. Cache SHA-256:
 `e4be3c7c6a3543a77ad07eddde44bfa42f6e58fa6a4bf47df53ea9e894f1e318`.
-
-The source dataset and dependency checkout are fetched by `scripts/setup.sh`
-and remain local under ignored `data/`. Audit transcripts and the smoke quote
-are excerpts from that public release, not newly generated conversations.
-Credentials and API response caches are excluded. To rerun offline evaluation,
-follow the root README. Live output may vary by hosted model version.
-
-## Subsequent full-experiment attempt
-
-`model-qualification.json` records that Gemma4 26B-A4B returned usable Yes/No
-probabilities and quote JSON, so it was selected on API functionality rather
-than test accuracy. `docs/experiment-plan.md` fixes all comparisons before the
-live evaluation. The newer implementation has 19 passing local tests.
-
-`experiment/` contains resumable live exports, which are **partial unless
-`status.json` says `complete` and all 151 IDs appear in the final evaluation**.
-Do not treat a prefix of annotations as a full experiment. The raw API cache is
-kept locally and excluded from Git. The human audit remains pending even after
-a successful automated scoring/evaluation run.
-
-The prompt-off factorial control is now rescored by the same current model,
-separate from the published cached XOR. This avoids a model/prompt confound;
-see the plan amendment. The controlled budget is 14,647 calls before retries.
-
-
-The active run now focuses on quote filtering with fixed released weights, per
-the user's cost/runtime request. `experiment/quote_annotations.jsonl` is the
-separate resumable export; the partial factorial `annotations.jsonl` is preserved.
-Final reduced-scope results will appear under `experiment/quote_evaluation/`.
-No completed corrected-prompt ablation is claimed.
+Setup fetches the source dependency into ignored `data/`. Credentials, raw API
+caches, and the user-uploaded proposal PDF remain excluded from GitHub.
