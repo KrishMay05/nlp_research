@@ -4,11 +4,12 @@
   "target_snippets": 151,
   "planned_unique_requests": 14647,
   "prompt_control": "same-model reason-only template",
-  "started_at": "2026-11-06T19:23:42.115781+00:00",
+  "started_at": "2026-11-07T01:39:44.560601+00:00",
   "plan": "docs/experiment-plan.md",
-  "source_commit": "f98318d7a6bf66e17a14ff895af19a5dbd1fc7f8",
-  "checkpoint_at": "2026-11-06T20:09:39.642195+00:00",
-  "exported_arguments_at_checkpoint": 1474,
-  "exported_zero_shot_at_checkpoint": 30,
+  "zero_shot_baseline_complete": true,
+  "zero_shot_baseline_snippets": 151,
+  "checkpoint_at": "2026-11-07T01:48:52.598410+00:00",
+  "exported_arguments_at_checkpoint": 1557,
+  "exported_zero_shot_at_checkpoint": 151,
   "complete_evaluation": false
 }

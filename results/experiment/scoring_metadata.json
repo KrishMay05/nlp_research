@@ -2,10 +2,12 @@
   "model": "gemma4:26b-a4b",
   "temperature": 0,
   "base_url": "https://genai.rcac.purdue.edu/api/",
-  "snippets": 30,
+  "snippets": 151,
   "probability": "P(Yes) / (P(Yes)+P(No)) from first token top logprobs",
   "prompt_version": 2,
   "prompt_control": "same-model original reason-only template",
   "state": "partial_checkpoint",
-  "target_snippets": 151
+  "target_snippets": 151,
+  "zero_shot_complete": true,
+  "argument_scoring_complete": false
 }
