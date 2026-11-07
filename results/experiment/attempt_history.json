@@ -77,5 +77,23 @@
     "updated_at": "2026-11-07T03:13:01.811026+00:00",
     "exported_arguments": 2274,
     "exported_zero_shot": 151
+  },
+  {
+    "state": "interrupted_environment_reconnect",
+    "model": "gemma4:26b-a4b",
+    "target_snippets": 151,
+    "planned_unique_requests": 14647,
+    "prompt_control": "same-model reason-only template",
+    "started_at": "2026-11-07T03:22:52.084781+00:00",
+    "plan": "docs/experiment-plan.md",
+    "source_commit": "91513a3d71de5592fe8ab2ef0d50a3085fcf560d",
+    "checkpoint_at": "2026-11-07T04:15:28.460594+00:00",
+    "exported_arguments_at_checkpoint": 2720,
+    "exported_zero_shot_at_checkpoint": 151,
+    "zero_shot_baseline_complete": true,
+    "complete_evaluation": false,
+    "updated_at": "2026-11-07T16:31:37.073133+00:00",
+    "exported_arguments": 2916,
+    "exported_zero_shot": 151
   }
 ]
