@@ -128,3 +128,40 @@ continues the much longer argument pool. Existing requests are reused from the
 same cache. This reordering changes neither prompts, model, scores, nor the
 predeclared factorial; it permits a complete baseline report before all argument
 scoring finishes. No method is selected or tuned from that early baseline.
+
+
+## User-directed amendment: finish quote filtering first
+
+On November 7, the user requested lower cost/runtime and suggested skipping
+redundant corrected-rebuttal calls when the main question is quote filtering.
+The remaining primary run is now `--quote-only`: compare filtering off/on using
+both XOR and grounded aggregation, holding **all released cached weights fixed**
+in both arms. Neither corrected nor reason-only rebuttal probabilities are
+requested. This is a narrower experiment, not completion of the original 2×2×2
+factorial. The partial factorial exports and every successful API cache entry
+are preserved for a later optional prompt ablation. The scope change follows
+the user's resource constraint; it is not selected from argument-arm accuracy.
+
+An offline cache inventory found 3,333 reusable quote checks, 151 complete
+zero-shot calls, and 1,664 calls for each rebuttal prompt. The remaining primary
+run needs 3,915 quote calls instead of 7,835 calls for the full factorial, saving
+3,920 prospective calls before retries. The quote-plus-zero-shot design totals
+7,399 unique calls; previously completed rebuttal requests are sunk work and
+remain in the cache. At Purdue's pacing floor, 3,915 calls take 3.48 hours before
+additional inference latency, retries, and local evaluation.
+
+Use separate `quote_annotations.jsonl`, `quote_scoring_metadata.json`, and
+`quote_evaluation/` exports. Require every one of the 7,248 argument IDs and
+all 151 snippet IDs before headline comparisons. Report the grounded filtered
+arm against grounded cached as well as the other baselines. Ignore any newer
+rebuttal score fields even if a partial factorial export is supplied, so that
+quote filtering is the sole change within each aggregation comparison.
+
+The endpoint, model, kind, full prompt and parameters enter each request's
+cache key. Switching providers or model IDs creates new request identities;
+Purdue responses must not be presented as responses from another model. A
+Nous alternative must first pass authenticated model/format/latency checks and
+have a priced budget estimate. Complete-model comparisons require a separate
+annotation pool rather than mixing providers across snippets. Nous access was
+not available in the running environment at this amendment, so Purdue remains
+the active provider. The offered $19 credit has not been spent.

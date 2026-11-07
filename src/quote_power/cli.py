@@ -45,15 +45,29 @@ def evaluate(args):
     gold = [r['label'] for r in rows]
     rules = Path(args.rules).read_text()
     annotations = keyed(args.annotations) if args.annotations else {}
+    quote_only = getattr(args, 'quote_only', False)
+    if quote_only and args.factorial:
+        raise ValueError('--quote-only and --factorial are mutually exclusive')
+    if quote_only and not args.annotations:
+        raise ValueError('--quote-only requires complete --annotations')
     if args.factorial and not args.annotations:
         raise ValueError('--factorial requires complete --annotations')
     methods = {'majority_A': [dict(prediction='A', retained=48) for r in rows]}
     methods['xor_cached'] = [xor(r, rules) for r in rows]
     methods['grounded_cached'] = [grounded(r) for r in rows]
-    if args.factorial:
+    if args.factorial or quote_only:
         required = {a['id'] for r in rows for a in r['arguments']}
         if required != set(annotations):
             raise ValueError('Annotations must cover exactly all dataset arguments')
+    if quote_only:
+        # Hold every released score fixed in both arms, even if annotations
+        # came from a partial factorial export containing newer probabilities.
+        quotes = {key: {k: v for k, v in ann.items() if k not in (
+            'rebuttal_probability', 'original_rebuttal_probability')}
+            for key, ann in annotations.items()}
+        methods['xor_quote1_cached_scores'] = [xor(r, rules, quotes, True) for r in rows]
+        methods['grounded_quote1_cached_scores'] = [grounded(r, quotes, True) for r in rows]
+    if args.factorial:
         for q in (False, True):
             for c in (False, True):
                 for agg in ('xor', 'grounded'):
@@ -74,7 +88,8 @@ def evaluate(args):
             raise ValueError('Zero-shot predictions must cover exactly all snippets')
         methods['zero_shot'] = [zero[r['id']] for r in rows]
     predictions = {k: [r['prediction'] for r in values] for k, values in methods.items()}
-    report = dict(snippets=len(rows), published_xor_accuracy=.543, methods={})
+    report = dict(snippets=len(rows), published_xor_accuracy=.543, methods={},
+                  scope='quote_filter_only' if quote_only else 'full_factorial' if args.factorial else 'baselines')
     total_reasons = sum(a['kind'] == 'reason' for row in rows for a in row['arguments'])
     for name, values in methods.items():
         report['methods'][name] = dict(accuracy=accuracy(gold, predictions[name]),
@@ -82,8 +97,10 @@ def evaluate(args):
             accepted_reason_coverage=(sum(v['accepted_reason_count'] for v in values) / total_reasons) if total_reasons and all('accepted_reason_count' in v for v in values) else None,
             empty_evidence_fallbacks=sum(v.get('fallback') == 'no_surviving_reasons' for v in values),
             argument_coverage=(sum(r.get('retained', 0) for r in values) / sum(len(r['arguments']) for r in rows)) if name not in {'zero_shot', 'majority_A'} else None,
-            comparisons={b: paired(gold, predictions[name], predictions[b]) for b in ('majority_A', 'xor_cached', 'zero_shot') if b in predictions and b != name})
-    if args.factorial:
+            comparisons={b: paired(gold, predictions[name], predictions[b]) for b in
+                         (('majority_A', 'xor_cached', 'grounded_cached', 'zero_shot') if quote_only else
+                          ('majority_A', 'xor_cached', 'zero_shot')) if b in predictions and b != name})
+    if args.factorial or quote_only:
         report['quote_checks'] = quote_diagnostics(rows, annotations)
     report['xor_published_delta'] = report['methods']['xor_cached']['accuracy'] - .543
     out = Path(args.output)
@@ -106,6 +123,7 @@ def main():
     p.add_argument('--annotations')
     p.add_argument('--zero-shot')
     p.add_argument('--factorial', action='store_true')
+    p.add_argument('--quote-only', action='store_true', help='Compare quote filtering with fixed released scores; no prompt ablation')
     p = commands.add_parser('score')
     p.add_argument('--data', default='data/processed/snippets.jsonl')
     p.add_argument('--model', required=True)
@@ -113,6 +131,7 @@ def main():
     p.add_argument('--cache', default='results/api-cache')
     p.add_argument('--output', default='results/scored')
     p.add_argument('--limit', type=int, help='Smoke run only; cannot satisfy full evaluation')
+    p.add_argument('--quote-only', action='store_true', help='Reuse quote cache and skip both rebuttal probability requests')
     p = commands.add_parser('audit')
     p.add_argument('--data', default='data/processed/snippets.jsonl')
     p.add_argument('--annotations')
@@ -128,7 +147,7 @@ def main():
         from .scoring import score
         if args.limit is not None and args.limit < 1:
             parser.error('--limit must be positive')
-        score(load(args.data), args.model, args.cache, args.output, args.base_url, args.limit)
+        score(load(args.data), args.model, args.cache, args.output, args.base_url, args.limit, args.quote_only)
     else:
         annotations = keyed(args.annotations) if args.annotations else {}
         pool = [dict(snippet_id=r['id'], transcript=r['transcript'], **a,

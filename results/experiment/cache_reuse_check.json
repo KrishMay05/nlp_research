@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-11-07T17:20:29.248723+00:00",
+  "method": "offline exact request lookup; network completion disabled",
+  "model": "gemma4:26b-a4b",
+  "endpoint": "https://genai.rcac.purdue.edu/api/",
+  "requests": {
+    "quote": {
+      "cached": 3333,
+      "missing": 3915
+    },
+    "corrected": {
+      "cached": 1664,
+      "missing": 1960
+    },
+    "original": {
+      "cached": 1664,
+      "missing": 1960
+    },
+    "zero_shot": {
+      "cached": 151
+    }
+  },
+  "remaining_full_factorial": 7835,
+  "remaining_quote_only": 3915,
+  "prospective_calls_saved": 3920,
+  "cache_identity": [
+    "endpoint",
+    "request_kind",
+    "model",
+    "temperature",
+    "messages",
+    "output_parameters"
+  ],
+  "tests_passed": 22,
+  "nous_runtime_credential_available": false,
+  "nous_network_allowed": false
+}

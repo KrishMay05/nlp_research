@@ -183,3 +183,80 @@ def test_compact_quote_recovery_falls_back_without_inventing_judgments(tmp_path,
     assert result['_request_metadata']['quote_formatting_attempts'] == 3
     assert len(list(tmp_path.glob('*.json'))) == 1
     assert len(list((tmp_path/'errors').glob('*.json'))) == 2
+
+
+def test_cache_isolated_by_model_and_endpoint(tmp_path, monkeypatch):
+    import openai
+    import quote_power.scoring as scoring
+    calls = []
+    def client(**options):
+        def create(**payload):
+            calls.append((options['base_url'], payload['model']))
+            tokens = [Obj(token='Yes', logprob=-.2), Obj(token='No', logprob=-2.)]
+            return Obj(choices=[Obj(message=Obj(content='Yes'), logprobs=Obj(content=[Obj(top_logprobs=tokens)]))])
+        return Obj(base_url=options['base_url'], chat=Obj(completions=Obj(create=create)))
+    monkeypatch.setenv('LLM_API_KEY', 'test-placeholder')
+    monkeypatch.setattr(openai, 'OpenAI', client)
+    monkeypatch.setattr(scoring.time, 'sleep', lambda _: None)
+    for model, endpoint in [('m1', 'https://one.invalid/'), ('m1', 'https://one.invalid/'),
+                            ('m2', 'https://one.invalid/'), ('m1', 'https://two.invalid/')]:
+        Scorer(model, tmp_path, endpoint).request('same question', 'yesno')
+    assert len(calls) == 3
+    assert len(list(tmp_path.glob('*.json'))) == 3
+
+
+def test_quote_only_reuses_successes_and_preserves_partial_factorial(tmp_path, monkeypatch):
+    import openai
+    import quote_power.scoring as scoring
+    from quote_power.data import load
+    calls = []
+    def create(**payload):
+        calls.append(payload)
+        if 'response_format' in payload:
+            content = json.dumps(dict(quote='NONE', evidence_speaker='A', supports=False, attribution_correct=True))
+            return Obj(choices=[Obj(message=Obj(content=content))])
+        tokens = [Obj(token='Yes', logprob=-.2), Obj(token='No', logprob=-2.)]
+        return Obj(choices=[Obj(message=Obj(content='Yes'), logprobs=Obj(content=[Obj(top_logprobs=tokens)]))])
+    monkeypatch.setenv('LLM_API_KEY', 'test-placeholder')
+    monkeypatch.setattr(openai, 'OpenAI', lambda **kw: Obj(base_url='https://one.invalid/', chat=Obj(completions=Obj(create=create))))
+    monkeypatch.setattr(scoring.time, 'sleep', lambda _: None)
+    row = dict(id='s', transcript='A: Decide.\nB: Okay.', arguments=[
+        dict(id='a', kind='reason', text='A decides.', side='A', target=None),
+        dict(id='r', kind='rebuttal', text='A only suggests.', side='A', target='a')])
+    output, cache = tmp_path/'out', tmp_path/'cache'
+    scoring.score([row], 'm', cache, output)
+    original_export = (output/'annotations.jsonl').read_bytes()
+    assert len(calls) == 5
+    # Two cached quotes and zero-shot are reused; only a new argument needs a call.
+    row['arguments'].append(dict(id='b', kind='reason', text='B agrees.', side='B', target=None))
+    scoring.score([row], 'm', cache, output, quote_only=True)
+    assert len(calls) == 6 and 'response_format' in calls[-1]
+    assert (output/'annotations.jsonl').read_bytes() == original_export
+    quotes = load(output/'quote_annotations.jsonl')
+    assert len(quotes) == 3
+    assert all('rebuttal_probability' not in a and 'original_rebuttal_probability' not in a for a in quotes)
+
+
+def test_quote_only_evaluation_holds_cached_scores_fixed(tmp_path):
+    row = dict(id='s', transcript='A: Decide now.\nB: Okay.', label='A', relations=[], arguments=[
+        dict(id='a', variable=2, side='A', kind='reason', text='A decides', validity=0, grounding=0, target=None),
+        dict(id='b', variable=5, side='B', kind='reason', text='B agrees', validity=0, grounding=-1, target=None),
+        dict(id='r', variable=8, side='A', kind='rebuttal', text='Only suggests', validity=0, grounding=-1, target='a')])
+    write(tmp_path/'data.jsonl', [row])
+    # Poisoned score fields must be ignored in the fixed-score comparison.
+    annotations = [dict(id=a['id'], quote='Decide now.', evidence_speaker='A', supports=True,
+                        attribution_correct=True, original_rebuttal_probability='invalid',
+                        rebuttal_probability='invalid') for a in row['arguments']]
+    write(tmp_path/'ann.jsonl', annotations)
+    (tmp_path/'rules.txt').write_text('XOR 2 1 2\nOROUT 2 3 1\nOROUT 2 6 2\n')
+    args = Obj(data=tmp_path/'data.jsonl', rules=tmp_path/'rules.txt', annotations=tmp_path/'ann.jsonl',
+               factorial=False, quote_only=True, zero_shot=None, output=tmp_path/'out')
+    evaluate(args)
+    report = json.loads((tmp_path/'out/report.json').read_text())
+    assert report['scope'] == 'quote_filter_only'
+    assert len(report['methods']) == 5
+    assert 'grounded_cached' in report['methods']['grounded_quote1_cached_scores']['comparisons']
+    assert report['methods']['xor_quote1_cached_scores']['accuracy'] == report['methods']['xor_cached']['accuracy']
+    write(tmp_path/'ann.jsonl', annotations[:-1])
+    with pytest.raises(ValueError, match='cover exactly'):
+        evaluate(args)

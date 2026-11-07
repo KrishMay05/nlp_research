@@ -4,10 +4,10 @@ Research implementation of the supplied Patel, Kim, and Alladin proposal.
 Code, tests, and recorded results are committed on the `main` branch.
 
 - [Completed baseline results](results/experiment/baseline_evaluation/README.md): all 151 snippets; Gemma4 zero-shot 66/151 (43.71%), cached XOR 82/151 (54.30%), majority A 83/151 (54.97%).
-- [Live experiment status](results/experiment/status.json) and [argument annotations](results/experiment/annotations.jsonl): checkpointed outputs from the ongoing full experiment; these are partial until status says `complete`.
+- [Live experiment status](results/experiment/status.json) and [quote annotations](results/experiment/quote_annotations.jsonl): checkpointed outputs from the ongoing full experiment; these are partial until status says `complete`.
 - [Results index](results/README.md), [experiment methods](docs/experiment-plan.md), [source code](src/quote_power), and [tests](tests).
 
-Purdue API access and `gemma4:26b-a4b` quote JSON and Yes/No probabilities have been verified. The full argument experiment is still running; no full factorial accuracy result is claimed.
+Purdue API access and `gemma4:26b-a4b` quote JSON and Yes/No probabilities have been verified. The active run focuses on quote filtering with fixed cached weights to reduce calls. The original factorial remains partial; no full factorial accuracy result is claimed.
 
 ## Quick start
 
@@ -189,3 +189,9 @@ a separate reproduction baseline. This avoids attributing a model change to a
 prompt correction. Including these 3,624 extra control calls revises the complete
 request budget to 14,647 (about 13 hours of pacing alone). Run `python scripts/run_experiment.py` with the activated environment to resume
 the full controlled experiment.
+
+
+The user-directed reduced run uses `python scripts/run_experiment.py --quote-only`.
+It reuses existing quote and zero-shot cache entries, skips both rebuttal rescoring
+prompts, and preserves the partial factorial exports. Final comparisons will be
+in `results/experiment/quote_evaluation/`; see the [plan amendment](docs/experiment-plan.md).

@@ -65,3 +65,10 @@ a successful automated scoring/evaluation run.
 The prompt-off factorial control is now rescored by the same current model,
 separate from the published cached XOR. This avoids a model/prompt confound;
 see the plan amendment. The controlled budget is 14,647 calls before retries.
+
+
+The active run now focuses on quote filtering with fixed released weights, per
+the user's cost/runtime request. `experiment/quote_annotations.jsonl` is the
+separate resumable export; the partial factorial `annotations.jsonl` is preserved.
+Final reduced-scope results will appear under `experiment/quote_evaluation/`.
+No completed corrected-prompt ablation is claimed.

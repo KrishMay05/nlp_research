@@ -163,7 +163,7 @@ class Scorer:
         return result
 
 
-def score(rows, model, cache, output, base_url=None, limit=None):
+def score(rows, model, cache, output, base_url=None, limit=None, quote_only=False):
     scorer = Scorer(model, cache, base_url)
     annotations, zero = [], []
     # Complete the cheap baseline first without changing request payloads.
@@ -177,7 +177,7 @@ def score(rows, model, cache, output, base_url=None, limit=None):
     for row in rows[:limit]:
         for arg in row['arguments']:
             ann = dict(id=arg['id'], **scorer.request(quote_prompt(row, arg), 'quote'))
-            if arg['kind'] == 'rebuttal':
+            if arg['kind'] == 'rebuttal' and not quote_only:
                 corrected = scorer.request(rebuttal_prompt(row, arg), 'yesno')
                 original = scorer.request(original_rebuttal_prompt(row, arg), 'yesno')
                 ann['rebuttal_probability'] = corrected['probability']
@@ -185,6 +185,9 @@ def score(rows, model, cache, output, base_url=None, limit=None):
                 ann['corrected_score_metadata'] = corrected.get('_request_metadata')
                 ann['original_score_metadata'] = original.get('_request_metadata')
             annotations.append(ann)
-            write(Path(output) / 'annotations.jsonl', annotations)
-    (Path(output) / 'scoring_metadata.json').write_text(json.dumps(dict(model=model, temperature=0, base_url=str(scorer.client.base_url),
-        snippets=len(zero), probability='P(Yes) / (P(Yes)+P(No)) from first token top logprobs', prompt_version=2, prompt_control='same-model original reason-only template'), indent=2))
+            write(Path(output) / ('quote_annotations.jsonl' if quote_only else 'annotations.jsonl'), annotations)
+    metadata_file = 'quote_scoring_metadata.json' if quote_only else 'scoring_metadata.json'
+    (Path(output) / metadata_file).write_text(json.dumps(dict(model=model, temperature=0, base_url=str(scorer.client.base_url),
+        snippets=len(zero), probability='P(Yes) / (P(Yes)+P(No)) from first token top logprobs', prompt_version=2,
+        scope='quote_filter_only' if quote_only else 'full_factorial',
+        prompt_control='fixed released cached weights' if quote_only else 'same-model original reason-only template'), indent=2))
