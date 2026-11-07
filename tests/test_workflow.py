@@ -10,6 +10,8 @@ from quote_power.scoring import Scorer
 
 def test_api_cache_reuses_only_matching_requests(tmp_path, monkeypatch):
     import openai
+    import quote_power.scoring as scoring
+    monkeypatch.setattr(scoring.time, 'sleep', lambda _: None)
     calls = []
     def create(**kwargs):
         calls.append(kwargs)
@@ -26,8 +28,9 @@ def test_api_cache_reuses_only_matching_requests(tmp_path, monkeypatch):
     assert len(calls) == 2
     with pytest.raises((json.JSONDecodeError, ValueError)):
         scorer.request('bad JSON response', 'quote')
-    assert calls[-1]['response_format']['json_schema']['strict'] is True
-    assert calls[-1]['response_format']['json_schema']['schema']['additionalProperties'] is False
+    assert calls[2]['response_format']['json_schema']['strict'] is True
+    assert calls[2]['response_format']['json_schema']['schema']['additionalProperties'] is False
+    assert calls[-1]['response_format']['type'] == 'json_object'
     assert len(list(tmp_path.glob('*.json'))) == 2
 
 
@@ -155,3 +158,28 @@ def test_score_completes_all_zero_shot_calls_before_argument_pool(tmp_path, monk
     annotations = load(tmp_path/'out/annotations.jsonl')
     assert len(annotations) == 4
     assert all(a['original_rebuttal_probability'] == .6 for a in annotations if a['id'].endswith(':r'))
+
+
+def test_compact_quote_recovery_falls_back_without_inventing_judgments(tmp_path, monkeypatch):
+    import openai
+    import quote_power.scoring as scoring
+    calls = []
+    valid = dict(quote='A: Decide.', evidence_speaker='A', supports=True, attribution_correct=True)
+    def create(**kwargs):
+        calls.append(kwargs)
+        if len(calls) < 3:
+            return Obj(choices=[Obj(message=Obj(content='{"quote":"A: Decide."\n\n'), finish_reason='length')])
+        return Obj(choices=[Obj(message=Obj(content=json.dumps(valid)), finish_reason='stop')])
+    monkeypatch.setenv('LLM_API_KEY', 'test-placeholder')
+    monkeypatch.setattr(openai, 'OpenAI', lambda **kw: Obj(base_url='https://test.invalid/', chat=Obj(completions=Obj(create=create))))
+    monkeypatch.setattr(scoring.time, 'sleep', lambda _: None)
+    result = Scorer('test', tmp_path).request('same evidence question', 'quote')
+    assert len(calls) == 3
+    assert calls[0]['response_format']['type'] == 'json_schema'
+    assert 'compact JSON' in calls[1]['messages'][0]['content']
+    assert calls[2]['response_format']['type'] == 'json_object'
+    assert all(c['messages'][1]['content'] == 'same evidence question' for c in calls)
+    assert result['quote'] == valid['quote'] and result['supports'] is True
+    assert result['_request_metadata']['quote_formatting_attempts'] == 3
+    assert len(list(tmp_path.glob('*.json'))) == 1
+    assert len(list((tmp_path/'errors').glob('*.json'))) == 2

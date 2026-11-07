@@ -65,11 +65,15 @@ Export the existing seeded 40-item human audit with model annotations. Human
 judgments must be supplied by a person and remain distinct from automated
 checks. Do not claim the human audit is complete until those fields are filled.
 
-The API may truncate structured JSON. For an explicitly length-truncated quote
-response, retry with up to two doubled output budgets (500 → 1,000 → 2,000).
-Never turn malformed or truncated output into a failed-quote judgment. A repeated
-failure blocks scoring rather than removing the corresponding argument/snippet.
-Successful requests are cached, so restarting the runner resumes prior work.
+Quote formatting failures allow at most three attempts: strict JSON schema at
+500 tokens, compact strict-schema JSON at 1,000, then compact JSON-object mode at
+2,000 with the same strict field/type validation enforced locally. The evidence
+question remains unchanged. Formatting-retry count and final decoder mode are
+recorded in successful cache metadata; failed bodies are kept only in the ignored
+local cache diagnostics. Use the first schema-valid response, without selecting
+on span matching, correctness, or test labels. Never turn malformed output into
+a failed-quote judgment. Exhausted recovery blocks the run instead of dropping
+an argument or snippet. Successful requests remain cached across restarts.
 
 ## Method amendment: hold the scoring model constant
 

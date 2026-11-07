@@ -112,14 +112,29 @@ class Scorer:
                 break
             try:
                 result = json.loads(choice.message.content)
-                if not isinstance(result, dict) or not isinstance(result.get('quote'), str) or result.get('evidence_speaker') not in {'A', 'B'} or any(type(result.get(k)) is not bool for k in ('supports', 'attribution_correct')):
+                if not isinstance(result, dict) or set(result) != set(QUOTE_SCHEMA['required']) or not isinstance(result.get('quote'), str) or result.get('evidence_speaker') not in {'A', 'B'} or any(type(result.get(k)) is not bool for k in ('supports', 'attribution_correct')):
                     raise ValueError('Malformed quote response; not cached')
-            except (json.JSONDecodeError, ValueError, TypeError):
-                # Diagnose truncated structured output and allow a bounded larger
-                # completion, without treating failed output as a rejected argument.
-                if getattr(choice, 'finish_reason', None) != 'length' or attempt == 2:
+            except (json.JSONDecodeError, ValueError, TypeError) as exc:
+                errors = self.cache / 'errors'
+                errors.mkdir(exist_ok=True)
+                (errors / f'{digest}-{attempt + 1}.json').write_text(json.dumps(dict(
+                    finish_reason=getattr(choice, 'finish_reason', None),
+                    max_tokens=payload['max_tokens'], response_format=payload['response_format']['type'],
+                    error_type=type(exc).__name__, content=choice.message.content)))
+                if attempt == 2:
                     raise
+                # Recover formatting only; retain the same evidence question.
+                # The last attempt avoids the schema decoder's whitespace loop,
+                # while this client still enforces the complete strict schema.
+                compact = (' Return one compact JSON object, without indentation or '
+                           'blank lines outside string values. Include exactly the '
+                           'required fields and types in this schema: '
+                           + json.dumps(QUOTE_SCHEMA, separators=(',', ':')))
+                payload['messages'] = [dict(role='system', content=SYSTEM + compact),
+                                       dict(role='user', content=prompt)]
                 payload['max_tokens'] *= 2
+                if attempt == 1:
+                    payload['response_format'] = {'type': 'json_object'}
             else:
                 break
         if kind != 'quote':
@@ -138,6 +153,8 @@ class Scorer:
             'model': self.model, 'served_model': getattr(response, 'model', None),
             'seconds_including_throttle': time.monotonic() - started,
             'usage': response.usage.model_dump() if getattr(response, 'usage', None) else None,
+            'quote_formatting_attempts': attempt + 1 if kind == 'quote' else None,
+            'quote_response_format': payload.get('response_format', {}).get('type'),
         }
         # Failed/invalid requests never become successful cache entries.
         tmp = path.with_suffix('.tmp')

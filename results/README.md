@@ -50,7 +50,7 @@ follow the root README. Live output may vary by hosted model version.
 `model-qualification.json` records that Gemma4 26B-A4B returned usable Yes/No
 probabilities and quote JSON, so it was selected on API functionality rather
 than test accuracy. `docs/experiment-plan.md` fixes all comparisons before the
-live evaluation. The newer implementation has 18 passing local tests.
+live evaluation. The newer implementation has 19 passing local tests.
 
 `experiment/` contains resumable live exports, which are **partial unless
 `status.json` says `complete` and all 151 IDs appear in the final evaluation**.
