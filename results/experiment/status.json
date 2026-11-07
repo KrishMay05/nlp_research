@@ -6,5 +6,12 @@
   "scope": "quote_filter_only",
   "prompt_control": "fixed released cached weights",
   "started_at": "2026-11-07T17:20:34.145681+00:00",
-  "plan": "docs/experiment-plan.md"
+  "plan": "docs/experiment-plan.md",
+  "source_commit": "db313fac2a32a39bb414742653223d07c6f7cf2b",
+  "checkpoint_at": "2026-11-07T17:24:18.086147+00:00",
+  "exported_arguments_at_checkpoint": 3395,
+  "exported_zero_shot_at_checkpoint": 151,
+  "zero_shot_baseline_complete": true,
+  "complete_evaluation": false,
+  "annotation_file": "quote_annotations.jsonl"
 }
