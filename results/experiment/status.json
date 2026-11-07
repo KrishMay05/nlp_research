@@ -8,8 +8,9 @@
   "plan": "docs/experiment-plan.md",
   "zero_shot_baseline_complete": true,
   "zero_shot_baseline_snippets": 151,
-  "checkpoint_at": "2026-11-07T01:48:52.598410+00:00",
-  "exported_arguments_at_checkpoint": 1557,
+  "checkpoint_at": "2026-11-07T02:33:20.609658+00:00",
+  "exported_arguments_at_checkpoint": 1941,
   "exported_zero_shot_at_checkpoint": 151,
-  "complete_evaluation": false
+  "complete_evaluation": false,
+  "source_commit": "dfbe4352a94dba18713e5a0b99b6009d0ac0be0d"
 }
