@@ -118,3 +118,9 @@ the matcher now preserves it. Cross-speaker spans still fail this conservative
 single-turn criterion. This correctness fix was identified from quote strings
 and model support judgments, without inspecting classification accuracy; it
 does not change API prompts or require new calls.
+
+Execution scheduling computes the 151-call zero-shot baseline first, then
+continues the much longer argument pool. Existing requests are reused from the
+same cache. This reordering changes neither prompts, model, scores, nor the
+predeclared factorial; it permits a complete baseline report before all argument
+scoring finishes. No method is selected or tuned from that early baseline.

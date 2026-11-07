@@ -149,6 +149,14 @@ class Scorer:
 def score(rows, model, cache, output, base_url=None, limit=None):
     scorer = Scorer(model, cache, base_url)
     annotations, zero = [], []
+    # Complete the cheap baseline first without changing request payloads.
+    for row in rows[:limit]:
+        prompt = json.dumps(dict(task='Does speaker A hold more conversational power than B? Answer only Yes or No.', transcript=row['transcript']))
+        answer = scorer.request(prompt, 'yesno')
+        probability = answer['probability']
+        zero.append(dict(id=row['id'], prediction='A' if probability >= .5 else 'B',
+                         probability_A=probability, request_metadata=answer.get('_request_metadata')))
+        write(Path(output) / 'zero_shot.jsonl', zero)
     for row in rows[:limit]:
         for arg in row['arguments']:
             ann = dict(id=arg['id'], **scorer.request(quote_prompt(row, arg), 'quote'))
@@ -161,11 +169,5 @@ def score(rows, model, cache, output, base_url=None, limit=None):
                 ann['original_score_metadata'] = original.get('_request_metadata')
             annotations.append(ann)
             write(Path(output) / 'annotations.jsonl', annotations)
-        prompt = json.dumps(dict(task='Does speaker A hold more conversational power than B? Answer only Yes or No.', transcript=row['transcript']))
-        answer = scorer.request(prompt, 'yesno')
-        probability = answer['probability']
-        zero.append(dict(id=row['id'], prediction='A' if probability >= .5 else 'B',
-                         probability_A=probability, request_metadata=answer.get('_request_metadata')))
-        write(Path(output) / 'zero_shot.jsonl', zero)
     (Path(output) / 'scoring_metadata.json').write_text(json.dumps(dict(model=model, temperature=0, base_url=str(scorer.client.base_url),
         snippets=len(zero), probability='P(Yes) / (P(Yes)+P(No)) from first token top logprobs', prompt_version=2, prompt_control='same-model original reason-only template'), indent=2))

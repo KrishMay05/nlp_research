@@ -129,3 +129,29 @@ def test_openwebui_connection_error_is_retried_but_invalid_requests_are_not(tmp_
         scorer.request('invalid', 'yesno')
     assert len(calls) == 1
     assert not list(tmp_path.glob('*.json'))
+
+
+def test_score_completes_all_zero_shot_calls_before_argument_pool(tmp_path, monkeypatch):
+    import quote_power.scoring as scoring
+    from quote_power.data import load
+    events = []
+    class FakeScorer:
+        def __init__(self, *args, **kwargs):
+            self.client = Obj(base_url='https://test.invalid/')
+        def request(self, prompt, kind):
+            events.append((kind, prompt))
+            if kind == 'quote':
+                return dict(quote='NONE', evidence_speaker='A', supports=False, attribution_correct=True)
+            return dict(probability=.6)
+    monkeypatch.setattr(scoring, 'Scorer', FakeScorer)
+    rows = [dict(id=str(i), transcript='A: Decide.\nB: Okay.', arguments=[
+        dict(id=f'{i}:a', kind='reason', text='A decides.', side='A', target=None),
+        dict(id=f'{i}:r', kind='rebuttal', text='A only suggests.', side='A', target=f'{i}:a')]) for i in range(2)]
+    scoring.score(rows, 'test', tmp_path/'cache', tmp_path/'out')
+    assert len(events) == 10
+    assert all(kind == 'yesno' and 'Does speaker A' in prompt for kind, prompt in events[:2])
+    assert events[2][0] == 'quote'
+    assert len(load(tmp_path/'out/zero_shot.jsonl')) == 2
+    annotations = load(tmp_path/'out/annotations.jsonl')
+    assert len(annotations) == 4
+    assert all(a['original_rebuttal_probability'] == .6 for a in annotations if a['id'].endswith(':r'))
