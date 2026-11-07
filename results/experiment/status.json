@@ -1,14 +1,15 @@
 {
-  "state": "blocked",
+  "state": "running",
   "model": "gemma4:26b-a4b",
   "target_snippets": 151,
   "planned_unique_requests": 14647,
   "prompt_control": "same-model reason-only template",
-  "started_at": "2026-11-07T01:39:44.560601+00:00",
+  "started_at": "2026-11-07T03:22:52.084781+00:00",
   "plan": "docs/experiment-plan.md",
-  "error_type": "JSONDecodeError",
-  "validation_error": "Expecting ',' delimiter: line 957 column 1 (char 3313)",
-  "updated_at": "2026-11-07T03:13:01.811026+00:00",
-  "exported_arguments": 2274,
-  "exported_zero_shot": 151
+  "source_commit": "cd855a58e842ca67ab369495fd0803ca90249fb9",
+  "checkpoint_at": "2026-11-07T03:40:02.232008+00:00",
+  "exported_arguments_at_checkpoint": 2420,
+  "exported_zero_shot_at_checkpoint": 151,
+  "zero_shot_baseline_complete": true,
+  "complete_evaluation": false
 }

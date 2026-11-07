@@ -63,5 +63,19 @@
     "updated_at": "2026-11-06T20:23:12.601719+00:00",
     "exported_arguments": 1542,
     "exported_zero_shot": 32
+  },
+  {
+    "state": "blocked",
+    "model": "gemma4:26b-a4b",
+    "target_snippets": 151,
+    "planned_unique_requests": 14647,
+    "prompt_control": "same-model reason-only template",
+    "started_at": "2026-11-07T01:39:44.560601+00:00",
+    "plan": "docs/experiment-plan.md",
+    "error_type": "JSONDecodeError",
+    "validation_error": "Expecting ',' delimiter: line 957 column 1 (char 3313)",
+    "updated_at": "2026-11-07T03:13:01.811026+00:00",
+    "exported_arguments": 2274,
+    "exported_zero_shot": 151
   }
 ]
